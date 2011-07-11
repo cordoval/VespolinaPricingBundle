@@ -1,25 +1,26 @@
 <?php
 
-/*
- * This file is part of the Symfony package.
+/**
+ * (c) 2011 Vespolina Project http://www.vespolina-project.org
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
 
-namespace Symfony\Component\Routing\Loader;
+namespace Vespolina\PricingBundle\Loader;
 
-use Symfony\Component\Routing\RouteCollection;
-use Symfony\Component\Routing\Route;
 use Symfony\Component\Config\Resource\FileResource;
 use Symfony\Component\Config\Loader\FileLoader;
 
+use Vespolina\PricingBundle\Model\PricingConfigurationCollection;
+use Vespolina\PricingBundle\Model\PricingConfiguration;
+use Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement;
+use Vespolina\PricingBundle\Model\PricingSetConfiguration;
+
 /**
- * XmlFileLoader loads XML routing files.
+ * XmlFileLoader loads pricing configuration files.
  *
- * @author Fabien Potencier <fabien@symfony.com>
+ * @author Daniel Kucharski <daniel@xerias.be>
  */
 class XmlFileLoader extends FileLoader
 {
@@ -29,7 +30,7 @@ class XmlFileLoader extends FileLoader
      * @param string $file An XML file path
      * @param string $type The resource type
      *
-     * @return RouteCollection A RouteCollection instance
+     * @return PricingConfigurationCollection A PricingConfigurationCollection instance
      *
      * @throws \InvalidArgumentException When a tag can't be parsed
      */
@@ -39,10 +40,10 @@ class XmlFileLoader extends FileLoader
 
         $xml = $this->loadFile($path);
 
-        $collection = new RouteCollection();
+        $collection = new PricingConfigurationCollection();
         $collection->addResource(new FileResource($path));
 
-        // process routes and imports
+        // process pricing configurations and imports
         foreach ($xml->documentElement->childNodes as $node) {
             if (!$node instanceof \DOMElement) {
                 continue;
@@ -57,16 +58,16 @@ class XmlFileLoader extends FileLoader
     /**
      * Parses a node from a loaded XML file.
      *
-     * @param RouteCollection $collection the collection to associate with the node
+     * @param PricingConfigurationCollection $collection the collection to associate with the node
      * @param DOMElement      $node the node to parse
      * @param string          $path the path of the XML file being processed
      * @param string          $file
      */
-    protected function parseNode(RouteCollection $collection, \DOMElement $node, $path, $file)
+    protected function parseNode(PricingConfigurationCollection $collection, \DOMElement $node, $path, $file)
     {
         switch ($node->tagName) {
-            case 'route':
-                $this->parseRoute($collection, $node, $path);
+            case 'pricing_configuration':
+                $this->parsePricingConfiguration($collection, $node, $path);
                 break;
             case 'import':
                 $resource = (string) $node->getAttribute('resource');
@@ -94,19 +95,24 @@ class XmlFileLoader extends FileLoader
     }
 
     /**
-     * Parses a route and adds it to the RouteCollection.
+     * Parses a pricing configuration and add it to the PricingConfigurationCollection.
      *
-     * @param RouteCollection $collection A RouteCollection instance
-     * @param \DOMElement     $definition Route definition
+     * @param PricingConfigurationCollection $collection A PricingConfigurationCollection instance
+     * @param \DOMElement     $definition PricingConfigurationCollection definition
      * @param string          $file       An XML file path
      *
      * @throws \InvalidArgumentException When the definition cannot be parsed
      */
-    protected function parseRoute(RouteCollection $collection, \DOMElement $definition, $file)
+    protected function parsePricingConfiguration(PricingConfigurationCollection $collection, \DOMElement $definition, $file)
     {
         $defaults = array();
         $requirements = array();
         $options = array();
+
+        $pricingConfiguration = new PricingConfiguration($definition->getAttribute('id'));
+
+        $pricingSetConfiguration = new PricingSetConfiguration();
+        $pricingConfiguration->setPricingSetConfiguration(($pricingSetConfiguration));
 
         foreach ($definition->childNodes as $node) {
             if (!$node instanceof \DOMElement) {
@@ -114,25 +120,148 @@ class XmlFileLoader extends FileLoader
             }
 
             switch ($node->tagName) {
-                case 'default':
-                    $defaults[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+
+                case 'pricing_execution':
+                    $this->parsePricingExecution($pricingSetConfiguration, $node);
                     break;
-                case 'option':
-                    $options[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
-                    break;
-                case 'requirement':
-                    $requirements[(string) $node->getAttribute('key')] = trim((string) $node->nodeValue);
+                case 'pricing_set':
+                    $this->parsePricingSet($pricingSetConfiguration, $node);
                     break;
                 default:
                     throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
             }
         }
 
-        $route = new Route((string) $definition->getAttribute('pattern'), $defaults, $requirements, $options);
-
-        $collection->add((string) $definition->getAttribute('id'), $route);
+        $collection->add((string) $definition->getAttribute('id'), $pricingConfiguration);
     }
 
+    
+    protected function parsePricingExecution(PricingSetConfiguration $pricingSetConfiguration, \DOMElement $definition )
+    {
+
+        foreach ($definition->childNodes as $node) {
+
+            $class = '';
+            $executionEvent = '';
+            $executionOptions = array();
+            $name =  '';
+
+            if (!$node instanceof \DOMElement) {
+                continue;
+            }
+
+            switch ($node->tagName) {
+
+                case 'step':
+
+                    $name = trim($node->getAttribute('name'));
+
+                    foreach($node->childNodes as $stepNode)
+                    {
+
+                        if (!$stepNode instanceof \DOMElement) {
+                            continue;
+                        }
+
+                        switch($stepNode->tagName)
+                        {
+
+                            case 'class':
+                                $class = trim($stepNode->nodeValue);
+                                break;
+                            case 'execution_event':
+                                $executionEvent = trim($stepNode->nodeValue);
+                                break;
+                            default:
+                                $executionOptions[$stepNode->tagName] = trim($stepNode->nodeValue);
+                        }
+
+                    }
+
+                    $pricingSetConfiguration->addPricingExecutionStep(
+                        new $class($name, $executionOptions),
+                        array('execution_event' => $executionEvent));
+
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException(sprintf('Unable to parse tag "%s"', $node->tagName));
+            }
+        }
+    }
+
+    protected function parsePricingSet(PricingSetConfiguration $pricingSetConfiguration, \DOMElement $definition )
+    {
+        foreach ($definition->childNodes as $node) {
+
+            $class = '';
+            $executionEvent = '';
+            $name =  '';
+
+            if (!$node instanceof \DOMElement) {
+                continue;
+            }
+
+            switch ($node->tagName) {
+
+                case 'dimension':
+
+                    $name = trim($node->getAttribute('name'));
+
+                    foreach($node->childNodes as $dimensionNode)
+                    {
+
+                        if (!$dimensionNode instanceof \DOMElement) {
+                            continue;
+                        }
+
+                        switch ($dimensionNode->tagName)
+                        {
+
+                            case 'class':
+                                $class = trim($dimensionNode->nodeValue);
+                                break;
+                        }
+
+                        $pricingSetConfiguration->addPricingDimension(
+                            new $class($name));
+                    }
+
+                    break;
+
+                case 'element':
+
+                    $name = trim($node->getAttribute('name'));
+
+                    foreach($node->childNodes as $elementNode)
+                    {
+
+                        if (!$elementNode instanceof \DOMElement) {
+                            continue;
+                        }
+                        
+                        switch ($elementNode->tagName)
+                        {
+                            case 'class':
+                                $class = trim($elementNode->nodeValue);
+                                break;
+                            case 'execution_event':
+                                $executionEvent = trim($elementNode->nodeValue);
+                                break;
+                        }
+                    }
+                    $pricingSetConfiguration->addPricingElement(
+                        new $class(array('name' => $name)),
+                        array('execution_event' => $executionEvent));
+
+                    break;
+
+                default:
+                    throw new \InvalidArgumentException(sprintf('Unable to parse pricing set tag "%s"', $node->tagName));
+            }
+        }
+    }
+    
     /**
      * Loads an XML file.
      *
@@ -152,7 +281,7 @@ class XmlFileLoader extends FileLoader
         $dom->validateOnParse = true;
         $dom->normalizeDocument();
         libxml_use_internal_errors(false);
-        $this->validate($dom);
+        //$this->validate($dom);
 
         return $dom;
     }
@@ -166,7 +295,7 @@ class XmlFileLoader extends FileLoader
      */
     protected function validate(\DOMDocument $dom)
     {
-        $location = __DIR__.'/schema/routing/routing-1.0.xsd';
+        $location = __DIR__.'/schema/pricing-1.0.xsd';
 
         $current = libxml_use_internal_errors(true);
         if (!$dom->schemaValidate($location)) {

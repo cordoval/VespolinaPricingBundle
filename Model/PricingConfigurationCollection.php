@@ -1,78 +1,72 @@
 <?php
-
-/*
- * This file is part of the Symfony package.
+/**
+ * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Fabien Potencier <fabien@symfony.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * This source file is subject to the MIT license that is bundled
+ * with this source code in the file LICENSE.
  */
-
-namespace Symfony\Component\Routing;
+namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\Config\Resource\ResourceInterface;
 
+use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
+
 /**
- * A RouteCollection represents a set of Route instances.
+ * A PricingConfigurationCollection represents a set of PricingConfiguration instances.
  *
- * @author Fabien Potencier <fabien@symfony.com>
- */
-class RouteCollection implements \IteratorAggregate
+ * @author Daniel Kucharski <daniel@xerias.be>
+ **/
+class PricingConfigurationCollection implements \IteratorAggregate
 {
-    private $routes;
-    private $resources;
-    private $prefix;
+    protected $pricingConfigurations;
 
     /**
      * Constructor.
      */
     public function __construct()
     {
-        $this->routes = array();
-        $this->resources = array();
-        $this->prefix = '';
+        $this->pricingConfigurations = array();
     }
 
     public function getIterator()
     {
-        return new \ArrayIterator($this->routes);
+        return new \ArrayIterator($this->pricingConfigurations);
     }
-
+    
     /**
-     * Adds a route.
+     * Adds a pricing configuration.
      *
-     * @param string $name  The route name
-     * @param Route  $route A Route instance
+     * @param string $name  The pricing configuration name
+     * @param PricingConfiguration  $pricingConfiguration A PricingConfigurationInterface instance
      *
-     * @throws \InvalidArgumentException When route name contains non valid characters
+     * @throws \InvalidArgumentException When pricing configuration name contains non valid characters
      */
-    public function add($name, Route $route)
+    public function add($name, PricingConfigurationInterface $pricingConfiguration)
     {
         if (!preg_match('/^[a-z0-9A-Z_.]+$/', $name)) {
-            throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a route name.', $name));
+            throw new \InvalidArgumentException(sprintf('Name "%s" contains non valid characters for a pricing configuration name.', $name));
         }
 
-        $this->routes[$name] = $route;
+        $this->pricingConfigurations[$name] = $pricingConfiguration;
     }
 
     /**
-     * Returns the array of routes.
+     * Returns the array of pricing configurations.
      *
-     * @return array An array of routes
+     * @return array An array of pricing configurations
      */
     public function all()
     {
-        $routes = array();
-        foreach ($this->routes as $name => $route) {
-            if ($route instanceof RouteCollection) {
-                $routes = array_merge($routes, $route->all());
+        $pricingConfigurations = array();
+        foreach ($this->pricingConfigurations as $name => $pricingConfiguration) {
+            if ($pricingConfiguration instanceof PricingConfigurationCollection) {
+                $pricingConfigurations = array_merge($pricingConfigurations, $pricingConfiguration->all());
             } else {
-                $routes[$name] = $route;
+                $pricingConfigurations[$name] = $pricingConfiguration;
             }
         }
 
-        return $routes;
+        return $pricingConfiguration;
     }
 
     /**
@@ -85,18 +79,19 @@ class RouteCollection implements \IteratorAggregate
     public function get($name)
     {
         // get the latest defined route
-        foreach (array_reverse($this->routes) as $routes) {
-            if (!$routes instanceof RouteCollection) {
+        foreach (array_reverse($this->pricingConfigurations) as $pricingConfigurations) {
+            if (!$pricingConfigurations instanceof PricingConfigurationCollection) {
                 continue;
             }
 
-            if (null !== $route = $routes->get($name)) {
-                return $route;
+            if (null !== $pricingConfiguration = $pricingConfigurations->get($name)) {
+                return $pricingConfiguration;
             }
         }
 
-        if (isset($this->routes[$name])) {
-            return $this->routes[$name];
+        if (isset($this->pricingConfigurations[$name])) {
+            
+            return $this->pricingConfigurations[$name];
         }
     }
 

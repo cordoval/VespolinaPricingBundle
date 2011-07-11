@@ -2,7 +2,6 @@
 /**
  * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Daniel Kucharski <daniel@xerias.be>
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -12,6 +11,11 @@ namespace Vespolina\PricingBundle\Model\PricingExecutionStep;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingExecutionStep;
 
+/**
+ * ContainerCompute calculates the given expression within the pricing context container.
+ *
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 class ContainerCompute extends PricingExecutionStep
 {
     public function execute()

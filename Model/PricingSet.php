@@ -65,6 +65,11 @@ class PricingSet implements PricingSetInterface
         return $this->pricingElements;
     }
 
+    public function setPricingConfigurationName($pricingConfigurationName)
+    {
+        $this->pricingConfigurationName = $pricingConfigurationName;
+    }
+
     public function setPricingDimensionParameters($name, $parameters)
     {
         $this->pricingDimensionParameters[$name] = $parameters;

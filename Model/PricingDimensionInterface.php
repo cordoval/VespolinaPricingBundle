@@ -2,7 +2,6 @@
 /**
  * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Daniel Kucharski <daniel@xerias.be>
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -11,14 +10,15 @@ namespace Vespolina\PricingBundle\Model;
 
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 
+/**
+ * PricingDimensionInterface is a generic interface for handling pricing dimensions
+ *
+ * An example of a pricing dimension is "time"(period) or (product)"volume"
+ *
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 interface PricingDimensionInterface
 {
-    /**
-     * Return the name of this pricing dimension
-     * @return
-     */
-    function getName();
-
     /**
      * Add dimension parameter
      *
@@ -27,6 +27,12 @@ interface PricingDimensionInterface
      * @return void
      */
     function addParameter($name, $value);
+    
+    /**
+     * Return the name of this pricing dimension
+     * @return
+     */
+    function getName();
 
     /**
      * Get all the parameter names for this dimension

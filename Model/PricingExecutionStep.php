@@ -13,6 +13,7 @@ use Vespolina\PricingBundle\Model\PricingElementInterface;
 
 abstract class PricingExecutionStep implements PricingExecutionStepInterface
 {
+    protected $name;
     protected $options;
     protected $pricingContextContainer;
 
@@ -21,9 +22,11 @@ abstract class PricingExecutionStep implements PricingExecutionStepInterface
      *
      * @param $options
      */
-    function __construct($options = array())
+    public function __construct($name, $options = array())
     {
+        $this->name = $name;
         $this->options = $options;
+
     }
 
     /**
@@ -32,11 +35,16 @@ abstract class PricingExecutionStep implements PricingExecutionStepInterface
      * @param PricingContextContainerInterface $pricingContextContainer
      * @return void
      */
-    function init(PricingContextContainerInterface $pricingContextContainer)
+    public function init(PricingContextContainerInterface $pricingContextContainer)
     {
         $this->pricingContextContainer = $pricingContextContainer;
     }
 
+    public function getName()
+    {
+
+        return $this->name;
+    }
     /**
      * Get option value
      *
@@ -51,11 +59,6 @@ abstract class PricingExecutionStep implements PricingExecutionStepInterface
         } else {
             return $default;
         }
-    }
-
-    function execute()
-    {
-
     }
 
     function getHandlerClass()

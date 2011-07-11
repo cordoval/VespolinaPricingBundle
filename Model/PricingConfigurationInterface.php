@@ -12,6 +12,7 @@ namespace Vespolina\PricingBundle\Model;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 
+
 interface PricingConfigurationInterface
 {
     /**
@@ -32,17 +33,4 @@ interface PricingConfigurationInterface
      */
     function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet);
 
-    /**
-     * Determine / calculate pricing set values for the given execution event
-     *
-     * @abstract
-     * @param PricingSetInterface $pricingSet
-     * @param PricingContextContainerInterface $container
-     * @param array $options
-     *  - execution_event :  all | context_independent | context_dependent
-     * @return void
-     */
-    function buildPricingSet(PricingSetInterface $pricingSet, 
-                           PricingContextContainerInterface $container, 
-                           $options = array());
  }

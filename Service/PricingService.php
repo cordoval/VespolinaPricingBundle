@@ -2,13 +2,13 @@
 /**
  * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Daniel Kucharski <daniel@xerias.be>
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
  
 namespace Vespolina\PricingBundle\Service;
 
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Vespolina\PricingBundle\Model\PriceableInterface;
@@ -17,10 +17,15 @@ use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
+use Vespolina\PricingBundle\Loader\XmlFileLoader;
 
 use Vespolina\PricingBundle\Service\PricingServiceInterface;
 
-
+/**
+ * PricingService handles the overall pricing proces
+ *
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 class PricingService extends ContainerAware implements PricingServiceInterface
 {
 
@@ -31,19 +36,11 @@ class PricingService extends ContainerAware implements PricingServiceInterface
      */
     function __construct()
     {
-        $this->pricingConfigurations = array();
+
     }
 
-     /**
-     * Build / calculate the necessary pricing values based on the pricing set,
-     *  a given runtime pricing context container and possible some options.
-     *
-     * @param PricingSetInterface $pricingSet
-     * @param PricingContextContainerInterface $container
-     * @param array $options Possible
-     *    Possible options:
-     *      - execution_event ( all | context_independent | context_dependent )
-     * @return void
+    /**
+     * @inheritdoc
      */
     public function buildPricingSet(PricingSetInterface $pricingSet,
                                     PricingContextContainerInterface $container,
@@ -54,17 +51,40 @@ class PricingService extends ContainerAware implements PricingServiceInterface
 
         $pricingConfiguration = $this->getPricingConfiguration($pricingConfigurationName);
 
-        if ($pricingConfiguration) {
+        if (!$pricingConfiguration) {
 
-            $pricingConfiguration->buildPricingSet($pricingSet, $container, $options);
         }
+
+
+        if (array_key_exists('execution_event', $options)) {
+            $executionEvent = $options['execution_event'];
+        } else {
+            $executionEvent = 'all';
+        }
+        //Init all pricing executions steps
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingExecutionSteps($executionEvent) as $pricingExecutionStep) {
+            $pricingExecutionStep->init($container);
+        }
+
+        //Execute all execution steps
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingExecutionSteps($executionEvent) as $pricingExecutionStep) {
+            $pricingExecutionStep->execute();
+        }
+
+        //The pricing context container is nicely filled. For now we expect that the name of the pricing element is exactly
+        //like the name in the pricing context container
+
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElements($executionEvent) as $pricingElement) {
+            $pricingElement->setValue($container->get($pricingElement->getName()));
+            $pricingSet->addPricingElement($pricingElement);
+        }
+
+        return $pricingSet;
+
     }
 
     /**
-     * Create a pricing set for this pricing configuration
-     *
-     * @param pricingConfiguration
-     * @return void
+     * @inheritdoc
      */
     public function createPricingSet(PricingConfigurationInterface $pricingConfiguration)
     {
@@ -75,13 +95,8 @@ class PricingService extends ContainerAware implements PricingServiceInterface
         }
     }
 
-
     /**
-     * Create a new pricing set container from an existing pricing set,
-     * copying necessary pricing element values to the pricing set container
-     *
-     * @param PricingSetInterface $pricingSet
-     * @return PricingContextContainer
+     * @inheritdoc
      */
     public function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet)
     {
@@ -90,16 +105,16 @@ class PricingService extends ContainerAware implements PricingServiceInterface
 
          $pricingConfiguration = $this->getPricingConfiguration($pricingConfigurationName);
 
-         if ($pricingConfiguration) {
+         if (!$pricingConfiguration) {
 
-             return $pricingConfiguration->createPricingContextContainerFromPricingSet($pricingSet);
+            throw new \RuntimeException(sprintf('Could not load pricing configuration "%s"', $pricingConfigurationName));
          }
+
+         return $pricingConfiguration->createPricingContextContainerFromPricingSet($pricingSet);
     }
 
     /**
-     * Create a new pricing context container
-     *
-     * @return \Vespolina\PricingBundle\Model\PricingConfigurationInterface
+     * @inheritdoc
      */
     public function createPricingContextContainer(PricingConfigurationInterface $pricingConfiguration)
     {
@@ -108,20 +123,29 @@ class PricingService extends ContainerAware implements PricingServiceInterface
     }
   
     /**
-     * Get a pricing configuration
-     *
-     * @param  $name    Pricing configuration name
-     * @return \Vespolina\PricingBundle\Model\PricingConfiguration
+     * @inheritdoc
      */
     public function getPricingConfiguration($name)
     {
-        if (!array_key_exists($name, $this->pricingConfigurations)) {
 
-            $this->pricingConfigurations[$name] = new PricingConfiguration($this);
+        return $this->pricingConfigurations->get($name);
+    }
 
-        }
+    /**
+     * @inheritdoc
+     */
+    public function loadPricingConfigurationFile($dir, $file)
+    {
 
-        return $this->pricingConfigurations[$name];
+        $loader = new XmlFileLoader(new FileLocator(array($dir)));
+
+        $pricingConfigurations = $loader->load($file);
+
+        //TODO: merge multiple pricing configuration files
+
+        $this->pricingConfigurations = $pricingConfigurations;
+
+
 
     }
 }
