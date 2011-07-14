@@ -2,7 +2,6 @@
 /**
  * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Daniel Kucharski <daniel@xerias.be>
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -15,6 +14,11 @@ use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Config\FileLocator;
 
+/**
+ * VespolinaPricingExtension loads the pricing bundle extension.
+ *
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 class VespolinaPricingExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)

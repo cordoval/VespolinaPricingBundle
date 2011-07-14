@@ -30,7 +30,8 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
         $this->pricingElements = array();
         $this->pricingExecutionSteps = array();
 
-        foreach ($this->executionEvents as $executionEvent) {
+        foreach ($this->executionEvents as $executionEvent)
+        {
             $this->pricingElements[$executionEvent] = array();
             $this->pricingExecutionSteps[$executionEvent] = array();
         }
@@ -45,12 +46,15 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
     {
         if (array_key_exists('execution_event', $options) && $options['execution_event']) {
             $executionEvent = $options['execution_event'];
-        } else {
+        }
+        else
+        {
             $executionEvent = $this->getExecutionEvents();
             $executionEvent = $executionEvent[0];
         }
 
         $this->pricingElements[$executionEvent][] = $pricingElement;
+                
     }
 
     public function addPricingExecutionStep(PricingExecutionStepInterface $executionStep, $options = array())
@@ -67,11 +71,13 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
 
     public function getExecutionEvents()
     {
+
         return $this->executionEvents;
     }
 
     public function getPricingDimensions()
     {
+
         return $this->pricingDimensions;
     }
 
@@ -88,18 +94,21 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
         return $this->pricingExecutionSteps[$executionStep];
     }
 
-    public function getPricingElements($executionStep = '')
+    public function getPricingElements($executionStep = 'all')
     {
+
         if ($executionStep == 'all') {
 
             $out = array();
 
             foreach ($this->executionEvents as $executionEvent) {
+
                 $out = array_merge($out, $this->pricingElements[$executionEvent]);
             }
 
             return $out;
         }
+        
         return $this->pricingElements[$executionStep];
     }
 }
