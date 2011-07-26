@@ -9,6 +9,7 @@
 
 namespace Vespolina\PricingBundle\Model;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 
 interface PricingExecutionStepInterface
@@ -26,7 +27,8 @@ interface PricingExecutionStepInterface
      * Execute this step
      *
      * @abstract
+     * @param ContainerInterface $container DI container
      * @return void
      */
-    function execute();
+    function execute(ContainerInterface $container);
 }

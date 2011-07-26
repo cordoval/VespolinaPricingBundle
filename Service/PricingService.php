@@ -53,6 +53,8 @@ class PricingService extends ContainerAware implements PricingServiceInterface
 
         if (!$pricingConfiguration) {
 
+            throw new \InvalidArgumentException(sprintf('Could not load pricing configuration "%s"', $pricingConfigurationName));
+
         }
 
 
@@ -63,12 +65,12 @@ class PricingService extends ContainerAware implements PricingServiceInterface
         }
         //Init all pricing executions steps
         foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingExecutionSteps($executionEvent) as $pricingExecutionStep) {
-            $pricingExecutionStep->init($container);
+            $pricingExecutionStep->init($container);    //Pricing context container
         }
 
         //Execute all execution steps
         foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingExecutionSteps($executionEvent) as $pricingExecutionStep) {
-            $pricingExecutionStep->execute();
+            $pricingExecutionStep->execute($this->container);   //DI container
         }
 
         //The pricing context container is nicely filled. For now we expect that the name of the pricing element is exactly

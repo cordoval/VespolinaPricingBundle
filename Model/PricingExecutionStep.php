@@ -55,8 +55,11 @@ abstract class PricingExecutionStep implements PricingExecutionStepInterface
     protected function getOption($name, $default = '')
     {
         if (array_key_exists($name, $this->options)) {
+
             return $this->options[$name];
+
         } else {
+            
             return $default;
         }
     }

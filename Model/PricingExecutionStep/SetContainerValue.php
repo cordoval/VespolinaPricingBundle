@@ -8,6 +8,8 @@
 
 namespace Vespolina\PricingBundle\Model\PricingExecutionStep;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
 use Vespolina\PricingBundle\Model\PricingExecutionStep;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 
@@ -23,7 +25,7 @@ class SetContainerValue extends PricingExecutionStep
         parent::BasePricingExecutionStep($options);
     }
 
-    public function execute()
+    public function execute(ContainerInterface $container)
     {
         $source = $this->getOption('source');
 

@@ -8,6 +8,7 @@
 
 namespace Vespolina\PricingBundle\Model\PricingExecutionStep;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingExecutionStep;
 
@@ -18,7 +19,7 @@ use Vespolina\PricingBundle\Model\PricingExecutionStep;
  */
 class ContainerCompute extends PricingExecutionStep
 {
-    public function execute()
+    public function execute(ContainerInterface $container)
     {
         $total = 0;
 
