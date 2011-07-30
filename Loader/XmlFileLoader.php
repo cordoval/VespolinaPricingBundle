@@ -237,9 +237,10 @@ class XmlFileLoader extends FileLoader
                     {
 
                         if (!$elementNode instanceof \DOMElement) {
-                            continue;
+                           continue;
+                        } else{
                         }
-                        
+
                         switch ($elementNode->tagName)
                         {
                             case 'class':
@@ -247,7 +248,6 @@ class XmlFileLoader extends FileLoader
                                 break;
                             case 'execution_event':
                                 $executionEvent = trim($elementNode->nodeValue);
-                                break;
                         }
                     }
                     $pricingSetConfiguration->addPricingElement(

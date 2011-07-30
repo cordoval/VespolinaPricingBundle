@@ -4,6 +4,7 @@ namespace Vespolina\PricingBundle\Tests\Service;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
+use Vespolina\PricingBundle\Model\PricingConstant;
 use Vespolina\PricingBundle\Service\Pricing;
 
 class SimpleProductPricingTest extends WebTestCase
@@ -163,5 +164,33 @@ class SimpleProductPricingTest extends WebTestCase
             }
             
         }
+
+        return $c;
+    }
+
+   /**
+     * @depends testA2CalculatePricingSets
+     */
+    public function testA3CalculateWithPricingConstant($c) {
+
+        //Create a new pricing constant to store the global download discount rate
+        $pricingConstant = new PricingConstant();
+        $pricingConstant->setName('global_download_discount_rate');
+        $pricingConstant->setValue(10); //10% discount
+        $c['pricingService']->addPricingConstant($pricingConstant);
+
+        $pricingConfiguration = $c['pricingService']->getPricingConfiguration('downloadable_product');
+        $pricingContextContainer = $c['pricingService']->createPricingContextContainer($pricingConfiguration);
+        $pricingSet = $c['pricingService']->createPricingSet($pricingConfiguration);
+
+        $pricingContextContainer->set('net_value', '500');
+
+        $c['pricingService']->buildPricingSet(
+            $pricingSet,
+            $pricingContextContainer,
+            array('execution_event' => 'all'));
+
+        $this->assertEquals($pricingSet->getPricingElement('net_value')->getValue(), 450);
+
     }
 }
