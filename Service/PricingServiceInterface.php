@@ -2,7 +2,6 @@
 /**
  * (c) Vespolina Project http://www.vespolina-project.org
  *
- * (c) Daniel Kucharski <daniel@xerias.be>
  * This source file is subject to the MIT license that is bundled
  * with this source code in the file LICENSE.
  */
@@ -12,12 +11,23 @@ namespace Vespolina\PricingBundle\Service;
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
+use Vespolina\PricingBundle\Model\PricingConstantInterface;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 
-
+/**
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 interface PricingServiceInterface
 {
 
+    /**
+     * Add a pricing constant (a global constant )
+     *
+     * @abstract
+     * @param \Vespolina\PricingBundle\Model\PricingConstantInterface $pricingConstant
+     * @return void
+     */
+    function addPricingConstant(PricingConstantInterface $pricingConstant);
 
     /**
      * Create a pricing context container and set pricing element values to the ones in
@@ -68,5 +78,15 @@ interface PricingServiceInterface
      * @return \Vespolina\PricingBundle\Model\PricingConfiguration
      */
     function getPricingConfiguration($name);
+
+    /**
+     * Get a pricing constant for a given name
+     *
+     * @abstract
+     * @param $name
+     * @return PricingConstantInterface
+     */
+    function getPricingConstant($name);
+
 
 }

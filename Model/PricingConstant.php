@@ -8,31 +8,22 @@
 
 namespace Vespolina\PricingBundle\Model;
 
+use Vespolina\PricingBundle\Model\PricingConstantInterface;
 use Vespolina\PricingBundle\Model\PricingElementInterface;
 /**
- * PricingElement is the basic entity needed to determine prices
- * An example of pricing element is 'net_value' of 'sales_tax_percentage'
+ * PricingConstant represents a global constant which is used by the price calculation process.
+ * From a functional perspective it is a global constant which can be used to easily
+ * apply global discounts, increase all net values by a given factor, ..  If a pricing execution step
+ * uses a pricing constant, modifying the pricing constant will have a direct impact on determined prices
  *
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingElement implements PricingElementInterface
+class PricingConstant implements  PricingConstantInterface
 {
-    protected $isDetermined;
     protected $name;
-    protected $value;
 
-    function __construct($options)
+    function __construct()
     {
-        $this->name = $options['name'];
-    }
-
-    /**
-     * @inheritdoc
-     */
-    public function getIsDetermined()
-    {
-
-        return $this->isDetermined;
     }
 
     /**
@@ -56,10 +47,9 @@ class PricingElement implements PricingElementInterface
     /**
      * @inheritdoc
      */
-    public function setIsDetermined($isDetermined)
+    public function setName($name)
     {
-
-        return $this->isDetermined = $isDetermined;
+        $this->name = $name;
     }
     
     /**

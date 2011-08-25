@@ -14,6 +14,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingConfiguration;
 use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
+use Vespolina\PricingBundle\Model\PricingConstantInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
@@ -29,7 +30,8 @@ use Vespolina\PricingBundle\Service\PricingServiceInterface;
 class PricingService extends ContainerAware implements PricingServiceInterface
 {
 
-    protected $pricingConfigurations = null;
+    protected $pricingConfigurations;
+    protected $pricingConstants;
 
     /**
      * Constructor
@@ -37,6 +39,16 @@ class PricingService extends ContainerAware implements PricingServiceInterface
     function __construct()
     {
 
+        $this->pricingConstants = array();
+
+    }
+
+     /**
+     * @inheritdoc
+     */
+    public function addPricingConstant(PricingConstantInterface $pricingConstant) {
+
+        $this->pricingConstants[$pricingConstant->getName()] = $pricingConstant;
     }
 
     /**
@@ -136,6 +148,18 @@ class PricingService extends ContainerAware implements PricingServiceInterface
     /**
      * @inheritdoc
      */
+    public function getPricingConstant($name)
+    {
+        if (array_key_exists($name, $this->pricingConstants)) {
+
+            return $this->pricingConstants[$name];
+        }
+
+    }
+    
+    /**
+     * @inheritdoc
+     */
     public function loadPricingConfigurationFile($dir, $file)
     {
 
@@ -143,11 +167,6 @@ class PricingService extends ContainerAware implements PricingServiceInterface
 
         $pricingConfigurations = $loader->load($file);
 
-        //TODO: merge multiple pricing configuration files
-
         $this->pricingConfigurations = $pricingConfigurations;
-
-
-
     }
 }

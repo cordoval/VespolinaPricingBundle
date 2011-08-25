@@ -46,6 +46,28 @@
             </step>
         </pricing_execution>
     </pricing_configuration>
-
+    <pricing_configuration id="downloadable_product">
+        <pricing_set>
+            <dimension name="period">
+                <class>Vespolina\PricingBundle\Model\PricingDimension\PeriodPricingDimension</class>
+            </dimension>
+            <element name="net_value">
+                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <execution_event>context_independent</execution_event>
+            </element>
+            <element name="total_excl_vat">
+                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <execution_event>context_dependent</execution_event>
+            </element>
+        </pricing_set>
+        <pricing_execution>
+            <step name="adjust_net_value_withh_pricing_constant">
+                <class>Vespolina\PricingBundle\Model\PricingExecutionStep\ApplyPricingConstantDiscount</class>
+                <source>global_download_discount_rate</source>
+                <target>net_value</target>
+                <execution_event>context_independent</execution_event>
+            </step>
+        </pricing_execution>
+    </pricing_configuration>
 
 </routes>

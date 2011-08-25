@@ -8,7 +8,12 @@
  */
 
 namespace Vespolina\PricingBundle\Model;
-
+/**
+ * PricingElement is the basic entity needed to determine prices
+ * An example of pricing element is 'net_value' of 'sales_tax_percentage'
+ *
+ * @author Daniel Kucharski <daniel@xerias.be>
+ */
 class PricingElementContainer
 {
     protected $entities;
