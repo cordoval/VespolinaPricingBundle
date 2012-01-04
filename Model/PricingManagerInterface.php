@@ -6,7 +6,7 @@
  * with this source code in the file LICENSE.
  */
  
-namespace Vespolina\PricingBundle\Service;
+namespace Vespolina\PricingBundle\Model;
 
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
@@ -17,7 +17,7 @@ use Vespolina\PricingBundle\Model\PricingSetInterface;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-interface PricingServiceInterface
+interface PricingManagerInterface
 {
 
     /**

@@ -5,7 +5,7 @@ namespace Vespolina\PricingBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use Vespolina\PricingBundle\Model\PricingConstant;
-use Vespolina\PricingBundle\Service\Pricing;
+use Vespolina\PricingBundle\Model\Pricing;
 
 class SimpleProductPricingTest extends WebTestCase
 {
@@ -31,9 +31,9 @@ class SimpleProductPricingTest extends WebTestCase
     public function testA1LoadPricingConfigurations()
     {
         $c = array();
-        $c['pricingService'] = $this->getKernel()->getContainer()->get('vespolina.pricing');
+        $c['pricingService'] = $this->getKernel()->getContainer()->get('vespolina.pricing_manager');
 
-        $c['pricingService']->loadPricingConfigurationFile(__DIR__.'/../config','pricing.xml');
+        $c['pricingService']->loadPricingConfigurationFile(__DIR__.'/config','pricing.xml');
 
         //Assert that pricing configuration 'default_product' exists
         $pricingConfiguration = $c['pricingService']->getPricingConfiguration('default_product');

@@ -6,10 +6,10 @@
  * with this source code in the file LICENSE.
  */
  
-namespace Vespolina\PricingBundle\Service;
+namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingConfiguration;
@@ -17,18 +17,20 @@ use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
 use Vespolina\PricingBundle\Model\PricingConstantInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
+use Vespolina\PricingBundle\Model\PricingManagerInterface;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 use Vespolina\PricingBundle\Loader\XmlFileLoader;
 
-use Vespolina\PricingBundle\Service\PricingServiceInterface;
 
 /**
  * PricingService handles the overall pricing proces
  *
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingService extends ContainerAware implements PricingServiceInterface
+class PricingManager implements PricingManagerInterface
 {
+
+    protected $container;
 
     protected $pricingConfigurations;
     protected $pricingConstants;
@@ -36,9 +38,10 @@ class PricingService extends ContainerAware implements PricingServiceInterface
     /**
      * Constructor
      */
-    function __construct()
+    function __construct(Container $container)
     {
 
+        $this->container = $container;
         $this->pricingConstants = array();
 
     }

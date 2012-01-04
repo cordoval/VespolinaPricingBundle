@@ -23,13 +23,33 @@ class VespolinaPricingExtension extends Extension
 {
     public function load(array $configs, ContainerBuilder $container)
     {
+        $processor = new Processor();
+        $configuration = new Configuration();
+
+        $config = $processor->processConfiguration($configuration, $configs);
+
         $loader = new XmlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
 
-        foreach (array('service') as $basename) {
-            $loader->load(sprintf('%s.xml', $basename));
+        if (!in_array(strtolower($config['db_driver']), array('mongodb', 'orm'))) {
+            throw new \InvalidArgumentException(sprintf('Invalid db driver "%s".', $config['db_driver']));
+        }
+        $loader->load(sprintf('%s.xml', $config['db_driver']));
+
+        if (isset($config['cart'])) {
+            $this->configureCart($config['cart'], $container);
+        }
+
+        if (isset($config['cart_item'])) {
+            $this->configureCartItem($config['cart_item'], $container);
         }
     }
 
+    protected function configureCart(array $config, ContainerBuilder $container)
+    {
+        if (isset($config['class'])) {
+            $container->setParameter('vespolina.cart.model.cart.class', $config['class']);
+        }
+    }
     public function getNamespace()
     {
         return 'http://www.vespolina-org/schema/dic/vespolina-pricing-v1';

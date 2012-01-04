@@ -28,7 +28,7 @@ class ApplyPricingConstantDiscount extends PricingExecutionStep
         $pricingConstantName = $this->getOption('source');
 
         //Load the pricing constant
-        $pricingConstant = $container->get('vespolina.pricing')->getPricingConstant($pricingConstantName);
+        $pricingConstant = $container->get('vespolina.pricing_manager')->getPricingConstant($pricingConstantName);
         //Do the mumbo jumbo
         if ($pricingConstant && $pricingConstantValue = $pricingConstant->getValue() ) {
 
