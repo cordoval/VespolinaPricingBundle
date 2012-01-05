@@ -7,11 +7,11 @@
  */
 namespace Vespolina\PricingBundle\Document;
 
-use Vespolina\PricingBundle\Model\PricingSet as AbstractPricingSet;
+use Vespolina\PricingBundle\Model\PricingElement as AbstractPricingElement;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingSet extends AbstractPricingSet
+class PricingElement extends AbstractPricingElement
 {
 
     protected $id;

@@ -4,24 +4,25 @@
                         xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
                         http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd">
 
-    <mapped-superclass name="Vespolina\PricingBundle\Document\PricingSet" collection="vespolina_pricing_sets">
+    <document name="Vespolina\PricingBundle\Document\PricingSet" collection="vespolina_pricing_sets">
 
         <field name="id" id="true" />
 
-        <field name="owner"     fieldName="owner" type="string" />
+        <field name="dimensionsKey"     fieldName="dimensionsKey" type="string" />
+        <field name="owner"             fieldName="owner" type="string" />
         <!--<field name="state"     fieldName="state" type="string" /> -->
-        <field name="updatedAt" fieldName="updatedAt" type="date" />
+        <field name="updatedAt"         fieldName="updatedAt" type="date" />
+
+        <embed-many fieldName="pricingElements"
+                     field="pricingElements"
+                     targetDocument="Vespolina\OrderBundle\Document\PricingElement"
+                     strategy="set"/>
+
         <!--
-        <embed-many fieldName="items"
-                    field="items"
-                    targetDocument="Vespolina\CartBundle\Document\CartItem"
-                    strategy="set">
-        </embed-many>
-        -->
         <lifecycle-callbacks>
             <lifecycle-callback type="prePersist" method="incrementCreatedAt" />
             <lifecycle-callback type="preUpdate" method="incrementUpdatedAt" />
         </lifecycle-callbacks>
-
-    </mapped-superclass>
+        -->
+    </document>
 </doctrine-mongo-mapping>

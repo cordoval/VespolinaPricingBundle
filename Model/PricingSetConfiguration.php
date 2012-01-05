@@ -10,12 +10,10 @@
 namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Vespolina\PricingBundle\Model\PriceableEntityInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
 use Vespolina\PricingBundle\Model\PricingDimensionInterface;
 use Vespolina\PricingBundle\Model\PricingSet;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
-use Vespolina\PricingBundle\Service\PricingServiceInterface;
 
 class PricingSetConfiguration implements PricingSetConfigurationInterface
 {

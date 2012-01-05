@@ -10,10 +10,7 @@ namespace Vespolina\PricingBundle\Document;
 use Symfony\Component\DependencyInjection\Container;
 use Doctrine\ODM\MongoDB\DocumentManager;
 
-use Vespolina\PricingBundle\Document\Pricing;
-use Vespolina\PricingBundle\Model\PricingableItemInterface;
-use Vespolina\PricingBundle\Model\PricingInterface;
-use Vespolina\PricingBundle\Model\PricingItemInterface;
+use Vespolina\PricingBundle\Model\PricingSetInterface;
 use Vespolina\PricingBundle\Model\PricingManager as BasePricingManager;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
@@ -78,9 +75,9 @@ class PricingManager extends BasePricingManager
     /**
      * @inheritdoc
      */
-    public function updatePricing(PricingInterface $cart, $andFlush = true)
+    public function updatePricingSet(PricingSetInterface $pricingSet, $andFlush = true)
     {
-        $this->dm->persist($cart);
+        $this->dm->persist($pricingSet);
         if ($andFlush) {
             $this->dm->flush();
         }

@@ -27,7 +27,7 @@ use Vespolina\PricingBundle\Loader\XmlFileLoader;
  *
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingManager implements PricingManagerInterface
+abstract class PricingManager implements PricingManagerInterface
 {
 
     protected $container;

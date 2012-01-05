@@ -9,9 +9,7 @@
 namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Vespolina\PricingBundle\Model\PriceableEntityInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
-use Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement;
 use Vespolina\PricingBundle\Model\PricingSet;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 
@@ -44,7 +42,8 @@ class PricingConfiguration implements PricingConfigurationInterface
      */
     public function createPricingSet()
     {
-        $pricingSet = new PricingSet();
+        //$pricingSet = new PricingSet();
+        $pricingSet = new \Vespolina\PricingBundle\Document\PricingSet; //TODO
 
         $pricingSet->setPricingConfigurationName($this->getName());
 

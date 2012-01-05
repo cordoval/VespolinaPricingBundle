@@ -89,4 +89,5 @@ interface PricingManagerInterface
     function getPricingConstant($name);
 
 
+    function updatePricingSet(PricingSetInterface $pricingSet, $andFlush = true);
 }

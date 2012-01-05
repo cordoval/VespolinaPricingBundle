@@ -13,15 +13,15 @@
                 <class>Vespolina\PricingBundle\Model\PricingDimension\VolumePricingDimension</class>
             </dimension>
             <element name="packaging_cost">
-                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <class>Vespolina\PricingBundle\Document\PricingElement</class>
                 <execution_event>context_independent</execution_event>
             </element>
             <element name="net_value">
-                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <class>Vespolina\PricingBundle\Document\PricingElement</class>
                 <execution_event>context_independent</execution_event>
             </element>
             <element name="total_excl_vat">
-                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <class>Vespolina\PricingBundle\Document\PricingElement</class>
                 <execution_event>context_dependent</execution_event>
             </element>
         </pricing_set>
@@ -52,11 +52,11 @@
                 <class>Vespolina\PricingBundle\Model\PricingDimension\PeriodPricingDimension</class>
             </dimension>
             <element name="net_value">
-                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <class>Vespolina\PricingBundle\Document\PricingElement</class>
                 <execution_event>context_independent</execution_event>
             </element>
             <element name="total_excl_vat">
-                <class>Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement</class>
+                <class>Vespolina\PricingBundle\Document\PricingElement</class>
                 <execution_event>context_dependent</execution_event>
             </element>
         </pricing_set>
