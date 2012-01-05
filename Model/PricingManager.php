@@ -91,26 +91,17 @@ abstract class PricingManager implements PricingManagerInterface
         //The pricing context container is nicely filled. For now we expect that the name of the pricing element is exactly
         //like the name in the pricing context container
 
-        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElements($executionEvent) as $pricingElement) {
-            $pricingElement->setValue($container->get($pricingElement->getName()));
-            $pricingSet->addPricingElement($pricingElement);
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations($executionEvent) as $pricingElementConfiguration) {
+
+            //Find and update the pricing element value
+            $pricingElement = $pricingSet->getPricingElement($pricingElementConfiguration->getName());
+            $pricingElement->setValue($container->get($pricingElementConfiguration->getName()));
         }
 
         return $pricingSet;
 
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function createPricingSet(PricingConfigurationInterface $pricingConfiguration)
-    {
-
-        if ($pricingConfiguration){
-
-            return $pricingConfiguration->createPricingSet();
-        }
-    }
 
     /**
      * @inheritdoc
@@ -135,16 +126,33 @@ abstract class PricingManager implements PricingManagerInterface
      */
     public function createPricingContextContainer(PricingConfigurationInterface $pricingConfiguration)
     {
-
         return new PricingContextContainer();
     }
   
+
+    public function initPricingSet(PricingSetInterface $pricingSet, PricingConfigurationInterface $pricingConfiguration)
+    {
+        //Set default pricing dimension parameters
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingDimensions() as $pricingDimension) {
+
+            $pricingDimension->setDefaultParametersForPricingSet($pricingSet);
+        }
+
+        //Instantiate pricing elements based on the  pricing element configurations
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations() as $pricingElementConfiguration) {
+
+            $pricingElementClass = $pricingElementConfiguration->getClass();
+            $pricingElement = new $pricingElementClass($pricingElementConfiguration->getName());
+            $pricingSet->addPricingElement($pricingElement);
+        }
+    }
+
+
     /**
      * @inheritdoc
      */
     public function getPricingConfiguration($name)
     {
-
         return $this->pricingConfigurations->get($name);
     }
 

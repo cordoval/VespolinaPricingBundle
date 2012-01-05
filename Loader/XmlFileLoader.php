@@ -14,8 +14,9 @@ use Symfony\Component\Config\Loader\FileLoader;
 
 use Vespolina\PricingBundle\Model\PricingConfigurationCollection;
 use Vespolina\PricingBundle\Model\PricingConfiguration;
-use Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement;
+use Vespolina\PricingBundle\Model\PricingElementConfiguration;
 use Vespolina\PricingBundle\Model\PricingSetConfiguration;
+
 
 /**
  * XmlFileLoader loads pricing configuration files.
@@ -250,9 +251,10 @@ class XmlFileLoader extends FileLoader
                                 $executionEvent = trim($elementNode->nodeValue);
                         }
                     }
-                    $pricingSetConfiguration->addPricingElement(
-                        new $class(array('name' => $name)),
-                        array('execution_event' => $executionEvent));
+
+                    $pricingElementConfiguration = new PricingElementConfiguration($name, $class, $executionEvent);
+
+                    $pricingSetConfiguration->addPricingElementConfiguration($pricingElementConfiguration);
 
                     break;
 

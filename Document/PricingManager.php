@@ -33,6 +33,25 @@ class PricingManager extends BasePricingManager
         parent::__construct($container);
     }
 
+    /**
+     * @inheritdoc
+     */
+    public function createPricingSet($pricingConfigurationName)
+    {
+
+        $pricingConfiguration = $this->getPricingConfiguration($pricingConfigurationName);
+
+        if ($pricingConfiguration) {
+
+            $pricingSet = new $this->pricingSetClass();
+            $pricingSet->setPricingConfigurationName($pricingConfigurationName);
+
+            $this->initPricingSet($pricingSet, $pricingConfiguration);
+
+        return $pricingSet;
+        }
+
+    }
 
     public function findPricingSetById($id)
     {

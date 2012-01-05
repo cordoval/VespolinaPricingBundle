@@ -15,13 +15,6 @@ use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 
 interface PricingConfigurationInterface
 {
-    /**
-     * Create a pricing set for this pricing configuration
-     *
-     * @abstract
-     * @return void
-     */
-    function createPricingSet();
 
     /**
      * Create a pricing context container and set pricing element values to the ones in

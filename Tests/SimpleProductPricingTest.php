@@ -41,7 +41,7 @@ class SimpleProductPricingTest extends WebTestCase
         $this->assertEquals($pricingConfiguration->getName(), 'default_product');
 
         //Are all pricing elements present?
-        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElements()));
+        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations()));
 
 
         return $c;
@@ -59,7 +59,7 @@ class SimpleProductPricingTest extends WebTestCase
         
 
         $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('default_product');
-        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElements()));
+        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations()));
 
          $this->assertEquals($pricingConfiguration->getName(), 'default_product');
             
@@ -83,7 +83,7 @@ class SimpleProductPricingTest extends WebTestCase
         //The difference between a price set and pricing context container is the fact that the latter
         //can contain more temporary runtime data which doesn't need to be stored at all
 
-        $pricingSet = $c['pricingManager']->createPricingSet($pricingConfiguration);
+        $pricingSet = $c['pricingManager']->createPricingSet('default_product');
 
 
         //1st dimension parameter: the price set is available only from today till next month
@@ -139,7 +139,7 @@ class SimpleProductPricingTest extends WebTestCase
         
         //Create pricing context container from the existing pricing set
     
-        $pricingSetTwo = $c['pricingManager']->createPricingSet($pricingConfiguration);
+        $pricingSetTwo = $c['pricingManager']->createPricingSet('default_product');
 
         $pricingSetTwo->setPricingDimensionParameters( 'period', 
                                                         array('from' => $nextMonth));
@@ -182,7 +182,7 @@ class SimpleProductPricingTest extends WebTestCase
 
         $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('downloadable_product');
         $pricingContextContainer = $c['pricingManager']->createPricingContextContainer($pricingConfiguration);
-        $pricingSet = $c['pricingManager']->createPricingSet($pricingConfiguration);
+        $pricingSet = $c['pricingManager']->createPricingSet('downloadable_product');
 
         $pricingContextContainer->set('net_value', '500');
 

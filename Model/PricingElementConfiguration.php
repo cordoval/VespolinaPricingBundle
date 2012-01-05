@@ -8,31 +8,34 @@
 
 namespace Vespolina\PricingBundle\Model;
 
-use Vespolina\PricingBundle\Model\PricingElementInterface;
+use Vespolina\PricingBundle\Model\PricingElementConfigurationInterface;
 /**
  * PricingElement is the basic entity needed to determine prices
  * An example of pricing element is 'net_value' of 'sales_tax_percentage'
  *
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingElement implements PricingElementInterface
+class PricingElementConfiguration implements PricingElementConfigurationInterface
 {
-    protected $isDetermined;
+    protected $class;
+    protected $executionEvent;
     protected $name;
-    protected $value;
+    protected $options;
 
-    function __construct($name)
+    function __construct($name, $class, $executionEvent, $options = array())
     {
         $this->name = $name;
+        $this->executionEvent = $executionEvent;
+        $this->class = $class;
+        $this->options = $options;
     }
 
     /**
      * @inheritdoc
      */
-    public function getIsDetermined()
+    public function getExecutionEvent()
     {
-
-        return $this->isDetermined;
+        return $this->executionEvent;
     }
 
     /**
@@ -40,17 +43,23 @@ class PricingElement implements PricingElementInterface
      */
     public function getName()
     {
-
         return $this->name;
     }
 
     /**
      * @inheritdoc
      */
-    public function getValue()
+    public function getClass()
     {
+        return $this->class;
+    }
 
-        return $this->value;
+    /**
+     * @inheritdoc
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     /**

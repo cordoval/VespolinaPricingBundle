@@ -62,7 +62,7 @@ interface PricingManagerInterface
      * @param pricingConfiguration
      * @return void
      */
-    function createPricingSet(PricingConfigurationInterface $pricingConfiguration);
+    function createPricingSet($priceConfigurationName);
 
     /**
      * Create a new pricing context container
