@@ -128,7 +128,37 @@ abstract class PricingManager implements PricingManagerInterface
     {
         return new PricingContextContainer();
     }
-  
+
+    /**
+     * @inheritdoc
+     */
+    public function createPricingElement($name)
+    {
+
+        $pricingElement = new $this->pricingElementClass($name);
+
+        return $pricingElement;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createPricingSet($pricingConfigurationName)
+    {
+
+        $pricingConfiguration = $this->getPricingConfiguration($pricingConfigurationName);
+
+        if ($pricingConfiguration) {
+
+            $pricingSet = new $this->pricingSetClass();
+            $pricingSet->setPricingConfigurationName($pricingConfigurationName);
+
+            $this->initPricingSet($pricingSet, $pricingConfiguration);
+
+        return $pricingSet;
+        }
+
+    }
 
     public function initPricingSet(PricingSetInterface $pricingSet, PricingConfigurationInterface $pricingConfiguration)
     {
@@ -141,8 +171,7 @@ abstract class PricingManager implements PricingManagerInterface
         //Instantiate pricing elements based on the  pricing element configurations
         foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations() as $pricingElementConfiguration) {
 
-            $pricingElementClass = $pricingElementConfiguration->getClass();
-            $pricingElement = new $pricingElementClass($pricingElementConfiguration->getName());
+            $pricingElement = $this->createPricingElement($pricingElementConfiguration->getName());
             $pricingSet->addPricingElement($pricingElement);
         }
     }

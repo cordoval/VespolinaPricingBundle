@@ -13,11 +13,13 @@ use Vespolina\PricingBundle\Model\PricingSetInterface;
 
 class PricingSet implements PricingSetInterface
 {
+    protected $createdAt;
     protected $dimensionsKey;
     protected $pricingConfigurationName;
     protected $pricingDimensionParameters;
     protected $pricingElements;
     protected $owner;
+    protected $updatedAt;
 
     public function __construct()
     {
@@ -28,6 +30,14 @@ class PricingSet implements PricingSetInterface
     public function addPricingElement(PricingElementInterface $pricingElement)
     {
         $this->pricingElements[$pricingElement->getName()] = $pricingElement;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
     }
 
     public function getDimensionsKey()
@@ -74,6 +84,33 @@ class PricingSet implements PricingSetInterface
     public function getPricingElements()
     {
         return $this->pricingElements;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function incrementCreatedAt()
+    {
+        if (null === $this->createdAt) {
+            $this->createdAt = new \DateTime();
+        }
+        $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function incrementUpdatedAt()
+    {
+        $this->updatedAt = new \DateTime();
     }
 
     public function setPricingConfigurationName($pricingConfigurationName)

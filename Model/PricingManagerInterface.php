@@ -29,17 +29,6 @@ interface PricingManagerInterface
      */
     function addPricingConstant(PricingConstantInterface $pricingConstant);
 
-    /**
-     * Create a pricing context container and set pricing element values to the ones in
-     * the pricing context container values
-     *
-     * @abstract
-     * @param PricingSetInterface $pricingSet
-     * @return void
-     */
-    function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet);
-
-
      /**
      * Build / calculate the necessary pricing values based on the pricing set,
      *  a given runtime pricing context container and possible some options.
@@ -63,6 +52,24 @@ interface PricingManagerInterface
      * @return void
      */
     function createPricingSet($priceConfigurationName);
+
+    /**
+     * Create a pricing context container and set pricing element values to the ones in
+     * the pricing context container values
+     *
+     * @abstract
+     * @param PricingSetInterface $pricingSet
+     * @return void
+     */
+    function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet);
+
+    /**
+     * Create a pricing element
+     *
+     * @abstract
+     * @param $name
+     */
+    function createPricingElement($name);
 
     /**
      * Create a new pricing context container
