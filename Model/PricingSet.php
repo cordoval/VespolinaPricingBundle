@@ -9,12 +9,17 @@
 
 namespace Vespolina\PricingBundle\Model;
 
+use Vespolina\PricingBundle\Model\PricingSetInterface;
+
 class PricingSet implements PricingSetInterface
 {
-    protected $key;
+    protected $createdAt;
+    protected $dimensionsKey;
     protected $pricingConfigurationName;
     protected $pricingDimensionParameters;
     protected $pricingElements;
+    protected $owner;
+    protected $updatedAt;
 
     public function __construct()
     {
@@ -22,9 +27,23 @@ class PricingSet implements PricingSetInterface
         $this->pricingElements = array();
     }
 
-    public function getKey()
+    public function addPricingElement(PricingElementInterface $pricingElement)
     {
-        if ($this->key == '') {
+        $this->pricingElements[$pricingElement->getName()] = $pricingElement;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getCreatedAt()
+    {
+        return $this->createdAt;
+    }
+
+    public function getDimensionsKey()
+    {
+        if (!$this->dimensionsKey) {
+
             //Construct the unique pricing set key based on the supplied dimensions parameters
             foreach ($this->pricingDimensionParameters as $pricingDimensionParameter) {
                 foreach ($pricingDimensionParameter as $parameter) {
@@ -36,16 +55,17 @@ class PricingSet implements PricingSetInterface
                 }
             }
 
-            if ($this->key == '') {
-                $this->key = 'default';
+            if (!$this->dimensionsKey) {
+                $this->dimensionsKey = 'default';
             }
         }
-        return $this->key;
+
+        return $this->dimensionsKey;
     }
 
-    public function addPricingElement(PricingElementInterface $pricingElement)
+    public function getOwner()
     {
-        $this->pricingElements[$pricingElement->getName()] = $pricingElement;
+        return $this->owner;
     }
 
     public function getPricingConfigurationName()
@@ -56,6 +76,7 @@ class PricingSet implements PricingSetInterface
     public function getPricingElement($name)
     {
         if (array_key_exists($name, $this->pricingElements)) {
+
             return $this->pricingElements[$name];
         }
     }
@@ -63,6 +84,33 @@ class PricingSet implements PricingSetInterface
     public function getPricingElements()
     {
         return $this->pricingElements;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updatedAt;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function incrementCreatedAt()
+    {
+        if (null === $this->createdAt) {
+            $this->createdAt = new \DateTime();
+        }
+        $this->updatedAt = new \DateTime();
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function incrementUpdatedAt()
+    {
+        $this->updatedAt = new \DateTime();
     }
 
     public function setPricingConfigurationName($pricingConfigurationName)
@@ -73,5 +121,10 @@ class PricingSet implements PricingSetInterface
     public function setPricingDimensionParameters($name, $parameters)
     {
         $this->pricingDimensionParameters[$name] = $parameters;
+    }
+
+    public function setOwner($owner)
+    {
+        $this->owner = $owner;
     }
 }

@@ -6,10 +6,10 @@
  * with this source code in the file LICENSE.
  */
  
-namespace Vespolina\PricingBundle\Service;
+namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\Config\FileLocator;
-use Symfony\Component\DependencyInjection\ContainerAware;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingConfiguration;
@@ -17,18 +17,20 @@ use Vespolina\PricingBundle\Model\PricingConfigurationInterface;
 use Vespolina\PricingBundle\Model\PricingConstantInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
+use Vespolina\PricingBundle\Model\PricingManagerInterface;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 use Vespolina\PricingBundle\Loader\XmlFileLoader;
 
-use Vespolina\PricingBundle\Service\PricingServiceInterface;
 
 /**
  * PricingService handles the overall pricing proces
  *
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-class PricingService extends ContainerAware implements PricingServiceInterface
+abstract class PricingManager implements PricingManagerInterface
 {
+
+    protected $container;
 
     protected $pricingConfigurations;
     protected $pricingConstants;
@@ -36,9 +38,10 @@ class PricingService extends ContainerAware implements PricingServiceInterface
     /**
      * Constructor
      */
-    function __construct()
+    function __construct(Container $container)
     {
 
+        $this->container = $container;
         $this->pricingConstants = array();
 
     }
@@ -88,26 +91,17 @@ class PricingService extends ContainerAware implements PricingServiceInterface
         //The pricing context container is nicely filled. For now we expect that the name of the pricing element is exactly
         //like the name in the pricing context container
 
-        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElements($executionEvent) as $pricingElement) {
-            $pricingElement->setValue($container->get($pricingElement->getName()));
-            $pricingSet->addPricingElement($pricingElement);
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations($executionEvent) as $pricingElementConfiguration) {
+
+            //Find and update the pricing element value
+            $pricingElement = $pricingSet->getPricingElement($pricingElementConfiguration->getName());
+            $pricingElement->setValue($container->get($pricingElementConfiguration->getName()));
         }
 
         return $pricingSet;
 
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function createPricingSet(PricingConfigurationInterface $pricingConfiguration)
-    {
-
-        if ($pricingConfiguration){
-
-            return $pricingConfiguration->createPricingSet();
-        }
-    }
 
     /**
      * @inheritdoc
@@ -132,16 +126,62 @@ class PricingService extends ContainerAware implements PricingServiceInterface
      */
     public function createPricingContextContainer(PricingConfigurationInterface $pricingConfiguration)
     {
-
         return new PricingContextContainer();
     }
-  
+
+    /**
+     * @inheritdoc
+     */
+    public function createPricingElement($name)
+    {
+
+        $pricingElement = new $this->pricingElementClass($name);
+
+        return $pricingElement;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function createPricingSet($pricingConfigurationName)
+    {
+
+        $pricingConfiguration = $this->getPricingConfiguration($pricingConfigurationName);
+
+        if ($pricingConfiguration) {
+
+            $pricingSet = new $this->pricingSetClass();
+            $pricingSet->setPricingConfigurationName($pricingConfigurationName);
+
+            $this->initPricingSet($pricingSet, $pricingConfiguration);
+
+        return $pricingSet;
+        }
+
+    }
+
+    public function initPricingSet(PricingSetInterface $pricingSet, PricingConfigurationInterface $pricingConfiguration)
+    {
+        //Set default pricing dimension parameters
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingDimensions() as $pricingDimension) {
+
+            $pricingDimension->setDefaultParametersForPricingSet($pricingSet);
+        }
+
+        //Instantiate pricing elements based on the  pricing element configurations
+        foreach ($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations() as $pricingElementConfiguration) {
+
+            $pricingElement = $this->createPricingElement($pricingElementConfiguration->getName());
+            $pricingSet->addPricingElement($pricingElement);
+        }
+    }
+
+
     /**
      * @inheritdoc
      */
     public function getPricingConfiguration($name)
     {
-
         return $this->pricingConfigurations->get($name);
     }
 

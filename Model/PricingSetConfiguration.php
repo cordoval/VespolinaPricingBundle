@@ -10,24 +10,22 @@
 namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Vespolina\PricingBundle\Model\PriceableEntityInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
 use Vespolina\PricingBundle\Model\PricingDimensionInterface;
 use Vespolina\PricingBundle\Model\PricingSet;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
-use Vespolina\PricingBundle\Service\PricingServiceInterface;
 
 class PricingSetConfiguration implements PricingSetConfigurationInterface
 {
     protected $pricingDimensions;
-    protected $pricingElements;
+    protected $pricingElementConfigurations;
     protected $pricingExecutionSteps;
 
     public function __construct()
     {
         $this->executionEvents = array('context_independent', 'context_dependent');
         $this->pricingDimensions = array();
-        $this->pricingElements = array();
+        $this->pricingElementConfigurations = array();
         $this->pricingExecutionSteps = array();
 
         foreach ($this->executionEvents as $executionEvent)
@@ -42,18 +40,12 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
         $this->pricingDimensions[$pricingDimension->getName()] = $pricingDimension;
     }
 
-    public function addPricingElement(PricingElementInterface $pricingElement, $options = array())
+    public function addPricingElementConfiguration(PricingElementConfigurationInterface $pricingElementConfiguration)
     {
-        if (array_key_exists('execution_event', $options) && $options['execution_event']) {
-            $executionEvent = $options['execution_event'];
-        }
-        else
-        {
-            $executionEvent = $this->getExecutionEvents();
-            $executionEvent = $executionEvent[0];
-        }
 
-        $this->pricingElements[$executionEvent][] = $pricingElement;
+        $executionEvent = $pricingElementConfiguration->getExecutionEvent();
+
+        $this->pricingElementConfigurations[$executionEvent][] = $pricingElementConfiguration;
                 
     }
 
@@ -94,7 +86,7 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
         return $this->pricingExecutionSteps[$executionStep];
     }
 
-    public function getPricingElements($executionStep = 'all')
+    public function getPricingElementConfigurations($executionStep = 'all')
     {
 
         if ($executionStep == 'all') {
@@ -103,12 +95,12 @@ class PricingSetConfiguration implements PricingSetConfigurationInterface
 
             foreach ($this->executionEvents as $executionEvent) {
 
-                $out = array_merge($out, $this->pricingElements[$executionEvent]);
+                $out = array_merge($out, $this->pricingElementConfigurations[$executionEvent]);
             }
 
             return $out;
         }
         
-        return $this->pricingElements[$executionStep];
+        return $this->pricingElementConfigurations[$executionStep];
     }
 }

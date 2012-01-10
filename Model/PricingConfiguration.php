@@ -9,9 +9,7 @@
 namespace Vespolina\PricingBundle\Model;
 
 use Symfony\Component\HttpKernel\Bundle\Bundle;
-use Vespolina\PricingBundle\Model\PriceableEntityInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainer;
-use Vespolina\PricingBundle\Model\PricingElement\MonetaryPricingElement;
 use Vespolina\PricingBundle\Model\PricingSet;
 use Vespolina\PricingBundle\Model\PricingSetInterface;
 
@@ -37,25 +35,6 @@ class PricingConfiguration implements PricingConfigurationInterface
         $this->name = $name;
     }
 
-    /**
-     * Create a new pricing set for this pricing configuration
-     *
-     * @return PricingSet
-     */
-    public function createPricingSet()
-    {
-        $pricingSet = new PricingSet();
-
-        $pricingSet->setPricingConfigurationName($this->getName());
-
-        //Set default pricing dimension values
-        foreach ($this->getPricingSetConfiguration()->getPricingDimensions() as $pricingDimension) {
-
-            $pricingDimension->setDefaultParametersForPricingSet($pricingSet);
-        }
-
-        return $pricingSet;
-    }
 
     public function createPricingContextContainer()
     {
@@ -74,7 +53,7 @@ class PricingConfiguration implements PricingConfigurationInterface
     {
         $pricingContextContainer = new PricingContextContainer();
 
-        foreach ($this->getPricingSetConfiguration()->getPricingElements('all') as $pricingElement) {
+        foreach ($pricingSet->getPricingElements() as $pricingElement) {
             
             $pricingContextContainer->set($pricingElement->getName(), $pricingElement->getValue());
         }

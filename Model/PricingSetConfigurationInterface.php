@@ -25,14 +25,14 @@ interface PricingSetConfigurationInterface
     function addPricingDimension(PricingDimensionInterface $pricingDimensionConfiguration);
 
     /**
-     * Add a pricing element to this pricing set configuration
+     * Add a pricing element configuration to this pricing set configuration
      *
      * @abstract
      * @param PricingElementInterface $pricingElement
      * @param array $options
      * @return void
      */
-    function addPricingElement(PricingElementInterface $pricingElement, $options = array());
+    function addPricingElementConfiguration(PricingElementConfigurationInterface $pricingElementConfiguration);
 
     /**
      * Add a pricing execution step to this pricing set configuration
@@ -62,11 +62,11 @@ interface PricingSetConfigurationInterface
     function getPricingExecutionSteps($executionEvent = '');
 
     /**
-     * Get pricing elements
+     * Get pricing element configurations
      *
      * @abstract
      * @param string $executionStep
      * @return void
      */
-    function getPricingElements();
+    function getPricingElementConfigurations();
 }

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="http://doctrine-project.org/schemas/orm/doctrine-mapping"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
+                    http://doctrine-project.org/schemas/orm/doctrine-mapping.xsd">
+
+    <entity name="Vespolina\PricingBundle\Entity\PricingSet" table="vespolina_pricing_set">
+        <id name="id" type="integer" column="id">
+            <generator strategy="AUTO" />
+        </id>
+
+        <field name="createdAt"                 fieldName="createdAt"     type="date"    nullable="true"/>
+        <field name="dimensionsKey"             fieldName="dimensionsKey" type="string"  nullable="true"/>
+        <field name="pricingConfigurationName"  fieldName="pricingConfigurationName"     type="string"/>
+
+        <field name="owner"                     fieldName="owner"         type="string"/>
+        <field name="updatedAt"                 fieldName="updatedAt"     type="date"    nullable="true"/>
+
+        <one-to-many field="pricingElements" target-entity="Vespolina\PricingBundle\Entity\PricingElement" mapped-by="pricingSet">
+            <cascade>
+               <cascade-all/>
+            </cascade>
+        </one-to-many>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="prePersist" method="incrementCreatedAt"/>
+            <lifecycle-callback type="preUpdate" method="incrementUpdatedAt"/>
+        </lifecycle-callbacks>
+    </entity>
+
+</doctrine-mapping>

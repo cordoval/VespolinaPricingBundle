@@ -5,7 +5,7 @@ namespace Vespolina\PricingBundle\Tests\Service;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 use Vespolina\PricingBundle\Model\PricingConstant;
-use Vespolina\PricingBundle\Service\Pricing;
+use Vespolina\PricingBundle\Model\Pricing;
 
 class SimpleProductPricingTest extends WebTestCase
 {
@@ -31,17 +31,17 @@ class SimpleProductPricingTest extends WebTestCase
     public function testA1LoadPricingConfigurations()
     {
         $c = array();
-        $c['pricingService'] = $this->getKernel()->getContainer()->get('vespolina.pricing');
+        $c['pricingManager'] = $this->getKernel()->getContainer()->get('vespolina.pricing_manager');
 
-        $c['pricingService']->loadPricingConfigurationFile(__DIR__.'/../config','pricing.xml');
+        $c['pricingManager']->loadPricingConfigurationFile(__DIR__.'/config','pricing.xml');
 
         //Assert that pricing configuration 'default_product' exists
-        $pricingConfiguration = $c['pricingService']->getPricingConfiguration('default_product');
+        $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('default_product');
 
         $this->assertEquals($pricingConfiguration->getName(), 'default_product');
 
         //Are all pricing elements present?
-        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElements()));
+        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations()));
 
 
         return $c;
@@ -58,8 +58,8 @@ class SimpleProductPricingTest extends WebTestCase
         $nextMonth = new \DateTime('first day of next month');
         
 
-        $pricingConfiguration = $c['pricingService']->getPricingConfiguration('default_product');
-        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElements()));
+        $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('default_product');
+        $this->assertGreaterThanOrEqual(3, count($pricingConfiguration->getPricingSetConfiguration()->getPricingElementConfigurations()));
 
          $this->assertEquals($pricingConfiguration->getName(), 'default_product');
             
@@ -72,10 +72,10 @@ class SimpleProductPricingTest extends WebTestCase
 
 
         //Retrieve pricing meta data
-        $pricingConfiguration = $c['pricingService']->getPricingConfiguration('default_product');
+        $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('default_product');
 
         //Create a pricing context container which is only used for runtime/execution purposes
-        $pricingContextContainer = $c['pricingService']->createPricingContextContainer($pricingConfiguration);
+        $pricingContextContainer = $c['pricingManager']->createPricingContextContainer($pricingConfiguration);
 
         //Pricing Configuration already knows that net value is expressed in euro, so we just need to set a value
         $pricingContextContainer->set('net_value', '100');  
@@ -83,7 +83,7 @@ class SimpleProductPricingTest extends WebTestCase
         //The difference between a price set and pricing context container is the fact that the latter
         //can contain more temporary runtime data which doesn't need to be stored at all
 
-        $pricingSet = $c['pricingService']->createPricingSet($pricingConfiguration);
+        $pricingSet = $c['pricingManager']->createPricingSet('default_product');
 
 
         //1st dimension parameter: the price set is available only from today till next month
@@ -96,7 +96,7 @@ class SimpleProductPricingTest extends WebTestCase
                                                     array('from' => 1, 
                                                           'to' =>  99));    
 
-        $c['pricingService']->buildPricingSet(
+        $c['pricingManager']->buildPricingSet(
             $pricingSet, 
             $pricingContextContainer, 
             array('execution_event' => 'context_independent'));
@@ -108,7 +108,7 @@ class SimpleProductPricingTest extends WebTestCase
 
         //$pricingContextContainer->setValue('customer', blb);
             
-        $c['pricingService']->buildPricingSet(
+        $c['pricingManager']->buildPricingSet(
             $pricingSet,
             $pricingContextContainer,
             array('execution_event' => 'context_dependent'));
@@ -139,15 +139,15 @@ class SimpleProductPricingTest extends WebTestCase
         
         //Create pricing context container from the existing pricing set
     
-        $pricingSetTwo = $c['pricingService']->createPricingSet($pricingConfiguration);
+        $pricingSetTwo = $c['pricingManager']->createPricingSet('default_product');
 
         $pricingSetTwo->setPricingDimensionParameters( 'period', 
                                                         array('from' => $nextMonth));
         
-        $pricingContextContainerTwo = $c['pricingService']->createPricingContextContainerFromPricingSet($pricingSetTwo);
+        $pricingContextContainerTwo = $c['pricingManager']->createPricingContextContainerFromPricingSet($pricingSetTwo);
         $pricingContextContainerTwo->set('net_value', '120');  
    
-        $c['pricingService']->buildPricingSet(
+        $c['pricingManager']->buildPricingSet(
             $pricingSetTwo,
             $pricingContextContainerTwo, 
             array('execution_event' => 'all'));
@@ -178,20 +178,34 @@ class SimpleProductPricingTest extends WebTestCase
         $pricingConstant = new PricingConstant();
         $pricingConstant->setName('global_download_discount_rate');
         $pricingConstant->setValue(10); //10% discount
-        $c['pricingService']->addPricingConstant($pricingConstant);
+        $c['pricingManager']->addPricingConstant($pricingConstant);
 
-        $pricingConfiguration = $c['pricingService']->getPricingConfiguration('downloadable_product');
-        $pricingContextContainer = $c['pricingService']->createPricingContextContainer($pricingConfiguration);
-        $pricingSet = $c['pricingService']->createPricingSet($pricingConfiguration);
+        $pricingConfiguration = $c['pricingManager']->getPricingConfiguration('downloadable_product');
+        $pricingContextContainer = $c['pricingManager']->createPricingContextContainer($pricingConfiguration);
+        $pricingSet = $c['pricingManager']->createPricingSet('downloadable_product');
 
         $pricingContextContainer->set('net_value', '500');
 
-        $c['pricingService']->buildPricingSet(
+        $c['pricingManager']->buildPricingSet(
             $pricingSet,
             $pricingContextContainer,
             array('execution_event' => 'all'));
 
         $this->assertEquals($pricingSet->getPricingElement('net_value')->getValue(), 450);
 
+        $c['pricingSetA3'] = $pricingSet;
+
+        return $c;
     }
+
+    /**
+      * @depends testA3CalculateWithPricingConstant
+      */
+     public function testA4PersistPricingSet($c) {
+
+         //Set the owner of this pricing set, in this case a product having ID "IPAD-2011"
+         $c['pricingSetA3']->setOwner('IPAD-2011');
+
+         $c['pricingManager']->updatePricingSet($c['pricingSetA3']);
+     }
 }

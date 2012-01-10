@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<container xmlns="http://symfony.com/schema/dic/services"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <parameters>
+        <parameter key="vespolina.pricing_manager.class">Vespolina\PricingBundle\Document\PricingManager</parameter>
+        <parameter key="vespolina.pricing.model.pricing_element.class">Vespolina\PricingBundle\Document\PricingElement</parameter>
+        <parameter key="vespolina.pricing.model.pricing_set.class">Vespolina\PricingBundle\Document\PricingSet</parameter>
+    </parameters>
+
+    <services>
+        <service id="vespolina.pricing.pricing_manager" class="%vespolina.pricing_manager.class%">
+            <argument type="service" id="service_container" />
+            <argument type="service" id="doctrine.odm.mongodb.default_document_manager" />
+            <argument>%vespolina.pricing.model.pricing_element.class%</argument>
+            <argument>%vespolina.pricing.model.pricing_set.class%</argument>
+        </service>
+        <service id="vespolina.pricing_manager" alias="vespolina.pricing.pricing_manager" />
+    </services>
+</container>

@@ -6,7 +6,7 @@
  * with this source code in the file LICENSE.
  */
  
-namespace Vespolina\PricingBundle\Service;
+namespace Vespolina\PricingBundle\Model;
 
 use Vespolina\PricingBundle\Model\PriceableInterface;
 use Vespolina\PricingBundle\Model\PricingContextContainerInterface;
@@ -17,7 +17,7 @@ use Vespolina\PricingBundle\Model\PricingSetInterface;
 /**
  * @author Daniel Kucharski <daniel@xerias.be>
  */
-interface PricingServiceInterface
+interface PricingManagerInterface
 {
 
     /**
@@ -28,17 +28,6 @@ interface PricingServiceInterface
      * @return void
      */
     function addPricingConstant(PricingConstantInterface $pricingConstant);
-
-    /**
-     * Create a pricing context container and set pricing element values to the ones in
-     * the pricing context container values
-     *
-     * @abstract
-     * @param PricingSetInterface $pricingSet
-     * @return void
-     */
-    function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet);
-
 
      /**
      * Build / calculate the necessary pricing values based on the pricing set,
@@ -62,7 +51,25 @@ interface PricingServiceInterface
      * @param pricingConfiguration
      * @return void
      */
-    function createPricingSet(PricingConfigurationInterface $pricingConfiguration);
+    function createPricingSet($priceConfigurationName);
+
+    /**
+     * Create a pricing context container and set pricing element values to the ones in
+     * the pricing context container values
+     *
+     * @abstract
+     * @param PricingSetInterface $pricingSet
+     * @return void
+     */
+    function createPricingContextContainerFromPricingSet(PricingSetInterface $pricingSet);
+
+    /**
+     * Create a pricing element
+     *
+     * @abstract
+     * @param $name
+     */
+    function createPricingElement($name);
 
     /**
      * Create a new pricing context container
@@ -89,4 +96,5 @@ interface PricingServiceInterface
     function getPricingConstant($name);
 
 
+    function updatePricingSet(PricingSetInterface $pricingSet, $andFlush = true);
 }

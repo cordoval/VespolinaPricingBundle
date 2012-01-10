@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mongo-mapping xmlns="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping"
+                        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                        xsi:schemaLocation="http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping
+                        http://doctrine-project.org/schemas/odm/doctrine-mongo-mapping.xsd">
+
+    <document name="Vespolina\PricingBundle\Document\PricingSet" collection="vespolinaPricingSet">
+
+        <field name="id" id="true" />
+
+        <field name="dimensionsKey"                 fieldName="dimensionsKey" type="string" />
+        <field name="owner"                         fieldName="owner" type="string" />
+        <field name="pricingConfigurationName"      fieldName="pricingConfigurationName" type="string" />
+        <!--<field name="state"     fieldName="state" type="string" /> -->
+        <field name="updatedAt"                     fieldName="updatedAt" type="date" />
+
+        <embed-many fieldName="pricingElements"
+                    field="pricingElements"
+                    targetDocument="Vespolina\OrderBundle\Document\PricingElement"
+                    strategy="set"/>
+
+        <lifecycle-callbacks>
+            <lifecycle-callback type="prePersist" method="incrementCreatedAt" />
+            <lifecycle-callback type="preUpdate" method="incrementUpdatedAt" />
+        </lifecycle-callbacks>
+    </document>
+</doctrine-mongo-mapping>
