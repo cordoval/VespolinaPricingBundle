@@ -40,7 +40,7 @@ class PricingManager extends BasePricingManager
 
         if ($id) {
 
-            return $this->dm->createQueryBuilder($this->prcingSetClass)
+            return $this->dm->createQueryBuilder($this->pricingSetClass)
                         ->field('id')->equals($id)
                         ->getQuery()
                         ->getSingleResult();
